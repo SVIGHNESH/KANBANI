@@ -147,6 +147,35 @@ update-desktop-database ~/.local/share/applications
 
 *(replace `USER` with your username)*
 
+## 🪟🍎🐧 Cross-platform: Windows & macOS
+
+KANBANI runs on **Windows, macOS, and Linux from this same source code** — no code changes required. Tauri, React, and `rusqlite` (with the `bundled` SQLite feature) are all fully portable, and the app-data path resolves correctly per OS (see the data table below).
+
+**The one catch:** Tauri links against each platform's *native* WebView, so cross-compiling isn't practical — you build **on** the target OS. The command is identical everywhere:
+
+```bash
+cd kanban
+npm install
+npm run tauri build
+```
+
+| Target      | Build on  | Prerequisites                                                                 | Installers produced            |
+| ----------- | --------- | ---------------------------------------------------------------------------- | ------------------------------ |
+| **Windows** | Windows   | Rust, Node, MSVC Build Tools, [WebView2](https://developer.microsoft.com/microsoft-edge/webview2/) (preinstalled on Win 10/11) | `.exe`, `.msi`, NSIS installer |
+| **macOS**   | macOS     | Rust, Node, Xcode Command Line Tools                                          | `.app`, `.dmg`                 |
+| **Linux**   | Linux     | see [Prerequisites](#prerequisites)                                           | binary, `.deb`, `.rpm`, AppImage |
+
+> The `NO_STRIP=true` workaround above is **Linux/AppImage-only** — ignore it on Windows and macOS.
+
+### Build all three from one place (CI)
+
+If you don't have a Mac or Windows PC, the official [`tauri-action`](https://github.com/tauri-apps/tauri-action) GitHub Actions workflow builds for all three platforms in the cloud and attaches the installers to a release when you push a version tag.
+
+### Signing (optional, for distribution)
+
+- **macOS:** to avoid Gatekeeper warnings, the `.app` should be code-signed and notarized with an Apple Developer account ($99/yr). Unsigned apps still run — users right-click → **Open** the first time.
+- **Windows:** an unsigned `.exe` may trigger a SmartScreen prompt; a code-signing certificate removes it.
+
 ## 💾 Where is my data?
 
 KANBANI stores everything in a single SQLite file in the OS app-data directory:
